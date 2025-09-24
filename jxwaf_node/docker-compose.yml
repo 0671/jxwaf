@@ -17,8 +17,8 @@ services:
       JXWAF_REQUEST_IP: 200m
       JXWAF_REQUEST_IP_COUNT: 200m
       JXWAF_LIMIT_BOT: 200m
-      JXWAF_SERVER: you_jxwaf_server_url
-      WAF_AUTH: you_auth_key
+      JXWAF_SERVER: ${JXWAF_SERVER}
+      WAF_AUTH: ${WAF_AUTH}
       TZ: Asia/Shanghai
     restart: unless-stopped
     volumes:
