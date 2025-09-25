@@ -10,7 +10,9 @@ spec:
   - port: 80
     targetPort: 80
     nodePort: 30080
+    name: jxwaf-http  # 为80端口添加名称
   - port: 443
     targetPort: 443
     nodePort: 30443
+    name: jxwaf-https
   type: NodePort
