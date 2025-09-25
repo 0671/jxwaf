@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql-db
+  namespace: jxwaf  # 指定名称空间
+spec:
+  serviceName: mysql-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-db
+  template:
+    metadata:
+      labels:
+        app: mysql-db
+    spec:
+      containers:
+      - name: mysql-db
+        image: ccr.ccs.tencentyun.com/jxwaf/mysql:5.7
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "958fba75-56c6-4e81-a892-62517a9e1739"
+        - name: MYSQL_CHARSET
+          value: "utf8mb4"
+        - name: MYSQL_COLLATION
+          value: "utf8mb4_unicode_ci"
+        - name: TZ
+          value: "Asia/Shanghai"
+        volumeMounts:
+        - name: mysql-data
+          mountPath: /var/lib/mysql
+        ports:
+        - containerPort: 3306
+        livenessProbe:
+          tcpSocket:
+            port: 3306
+          initialDelaySeconds: 30
+          periodSeconds: 10
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi  # 根据需求调整存储大小

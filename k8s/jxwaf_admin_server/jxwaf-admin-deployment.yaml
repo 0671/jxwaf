@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jxwaf-admin-server
+  namespace: jxwaf  # 指定名称空间
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jxwaf-admin-server
+  template:
+    metadata:
+      labels:
+        app: jxwaf-admin-server
+    spec:
+      containers:
+      - name: jxwaf-admin-server
+        image: ccr.ccs.tencentyun.com/jxwaf/jxwaf_admin_server:v1.48
+        env:
+        - name: ENABLE_HTTPS
+          value: "false"
+        - name: MYSQL_HOST
+          value: "mysql-db"  # 同一名称空间内直接通过服务名访问
+        - name: MYSQL_PORT
+          value: "3306"
+        - name: MYSQL_DATABASE
+          value: "jxwaf_admin_server"
+        - name: MYSQL_USER
+          value: "root"
+        - name: MYSQL_PASSWORD
+          value: "958fba75-56c6-4e81-a892-62517a9e1739"
+        - name: WAF_UPDATE_CONF_DATA
+          value: "1000m"
+        - name: TZ
+          value: "Asia/Shanghai"
+        ports:
+        - containerPort: 80
+        - containerPort: 443
+        volumeMounts:
+        - name: ssl-certs
+          mountPath: /opt/jxwaf_admin_server/nginx/conf/server.crt
+          subPath: server.crt  # 单独挂载证书文件
+        - name: ssl-certs
+          mountPath: /opt/jxwaf_admin_server/nginx/conf/server.key
+          subPath: server.key  # 单独挂载密钥文件
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 30
+          periodSeconds: 10
+      volumes:
+      - name: ssl-certs
+        secret:
+          secretName: jxwaf-ssl-certs  # 引用同一名称空间的Secret

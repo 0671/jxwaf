@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jxlog
+  namespace: jxwaf
+spec:
+  selector:
+    app: jxlog
+  ports:
+  - port: 8877
+    targetPort: 8877
+    nodePort: 30077  # NodePort范围通常是30000-32767
+  type: NodePort  # 允许从集群外部访问

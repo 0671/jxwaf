@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jxwaf-base
+  namespace: jxwaf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jxwaf-base
+  template:
+    metadata:
+      labels:
+        app: jxwaf-base
+    spec:
+      # 使用主机网络模式，与docker-compose中的network_mode: host对应
+      hostNetwork: true
+      # 特权模式，与docker-compose中的privileged: true对应
+      securityContext:
+        privileged: true
+        # 设置文件描述符限制，对应ulimits配置
+        ulimits:
+          - name: nofile
+            soft: 602400
+            hard: 602400
+      containers:
+      - name: jxwaf-base
+        image: ccr.ccs.tencentyun.com/jxwaf/jxwaf_node:v1.27
+        env:
+        - name: HTTP_PORT
+          value: "80"
+        - name: HTTPS_PORT
+          value: "443"
+        - name: WAF_CONF_DATA
+          value: "1000m"
+        - name: JXWAF_INNER
+          value: "2000m"
+        - name: JXWAF_PUBLIC
+          value: "2000m"
+        - name: JXWAF_REQUEST_COUNT
+          value: "200m"
+        - name: JXWAF_REQUEST_IP
+          value: "200m"
+        - name: JXWAF_REQUEST_IP_COUNT
+          value: "200m"
+        - name: JXWAF_LIMIT_BOT
+          value: "200m"
+        - name: JXWAF_SERVER
+          value: "you_jxwaf_server_url"  # 请替换为实际的服务器URL
+        - name: WAF_AUTH
+          value: "you_auth_key"  # 请替换为实际的认证密钥
+        - name: TZ
+          value: "Asia/Shanghai"
+        volumeMounts:
+        - name: nginx-cache
+          mountPath: /opt/jxwaf_data/nginx_cache
+        restartPolicy: Always  # 对应docker-compose的restart: unless-stopped
+      volumes:
+      - name: nginx-cache
+        hostPath:
+          # 对应docker-compose中的卷挂载
+          path: /opt/jxwaf_data/nginx_cache
+          # 如果路径不存在则创建目录
+          type: DirectoryOrCreate

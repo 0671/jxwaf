@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: clickhouse
+  namespace: jxwaf
+spec:
+  serviceName: clickhouse
+  replicas: 1
+  selector:
+    matchLabels:
+      app: clickhouse
+  template:
+    metadata:
+      labels:
+        app: clickhouse
+    spec:
+      containers:
+      - name: clickhouse
+        image: "ccr.ccs.tencentyun.com/jxwaf/clickhouse-server:22.8.5-alpine"
+        ports:
+        - containerPort: 9000
+        - containerPort: 9004
+        env:
+        - name: CLICKHOUSE_DB
+          value: "jxwaf"
+        - name: CLICKHOUSE_USER
+          value: "jxlog_user"
+        - name: CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT
+          value: "1"
+        - name: CLICKHOUSE_PASSWORD
+          value: "jxlog_password"
+        - name: TZ
+          value: "Asia/Shanghai"
+        volumeMounts:
+        - name: clickhouse-data
+          mountPath: /var/lib/clickhouse
+        restartPolicy: Always
+  volumeClaimTemplates:
+  - metadata:
+      name: clickhouse-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi  # 可根据需要调整存储大小
