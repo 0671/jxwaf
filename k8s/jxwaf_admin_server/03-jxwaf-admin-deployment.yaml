@@ -49,7 +49,9 @@ spec:
             port: 80
           initialDelaySeconds: 30
           periodSeconds: 10
+      # 证书存储卷配置，使用hostPath方便用户在本地修改
       volumes:
       - name: ssl-certs
-        secret:
-          secretName: jxwaf-ssl-certs  # 引用同一名称空间的Secret
+        hostPath:
+          path: /opt/jxwaf_data/ssl_certs  # 本地证书目录，用户可直接修改
+          type: DirectoryOrCreate  # 目录不存在则自动创建
