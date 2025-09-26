@@ -18,15 +18,7 @@ spec:
       - name: mysql-db
         image: ccr.ccs.tencentyun.com/jxwaf/mysql:5.7
         env:
-        - name: ENABLE_HTTPS
-          value: false
-        - name: MYSQL_PORT
-          value: 3306
-        - name: MYSQL_DATABASE
-          value: "jxwaf_admin_server"
-        - name: MYSQL_USER
-          value: "root"
-        - name: MYSQL_PASSWORD
+        - name: MYSQL_ROOT_PASSWORD
           value: "958fba75-56c6-4e81-a892-62517a9e1739"
         - name: MYSQL_CHARSET
           value: "utf8mb4"
@@ -52,3 +44,4 @@ spec:
       resources:
         requests:
           storage: 10Gi  # 根据需求调整存储大小
+
